@@ -85,16 +85,9 @@ if bg_img:
         </style>
     """, unsafe_allow_html=True)
 # --- Configuration ---
-api_key=st.secrets["bilal_api"]
-
-# Configure Gemini API key
-csi_id=st.secrets["bilal_cse"]
-
-# Configure Gemini API key
-
 # Store these in your Streamlit secrets (secrets.toml)
-API_KEY = st.secrets.get("google_api", {}).get("key", api_key)
-CSE_ID = st.secrets.get("google_api", {}).get("cse_id", csi_id)
+API_KEY = st.secrets.get("google_api", {}).get("key", "AIzaSyBYhKY9MQgCDX__BoKqvqx6z30VlnIAdsA")
+CSE_ID = st.secrets.get("google_api", {}).get("cse_id", "6517142dafb7440d8")
 
 # --- Product Database (Trimmed for brevity) ---
 MOTHER_PRODUCTS = {
@@ -462,15 +455,17 @@ def search_products(query: str, num_results: int = 8) -> Tuple[List[Dict], Optio
         return [], {"error": str(e)}
 
 # --- Main App ---
-def main():
-    # Configure page
-    
+# ... (keep all the imports and configuration code the same until the main() function)
 
+def main():
+ 
     # Initialize session state
     if "search_query" not in st.session_state:
         st.session_state.search_query = None
     if "debug_mode" not in st.session_state:
         st.session_state.debug_mode = False
+    if "show_recommendations" not in st.session_state:
+        st.session_state.show_recommendations = False
 
     # --- Sidebar ---
     with st.sidebar:
@@ -507,24 +502,41 @@ def main():
                 "first_baby": first_baby,
                 "travel": travel
             }  
-            # ... other baby-specific questions
 
         # Debug toggle
         st.session_state.debug_mode = st.checkbox("Debug Mode", False)
 
         if st.button("🔍 Find Products", type="primary"):
             st.session_state.search_query = None
+            st.session_state.show_recommendations = True
+            st.rerun()
 
     # --- Main Content ---
-    if st.session_state.search_query is None:
-        # Show recommendations
+    if not st.session_state.show_recommendations:
+        # Show empty page with instructions
+        st.title("Welcome to Motherly Heaven")
+        st.markdown("""
+            ### 🤱 Your Personalized Pregnancy & Baby Shopping Guide
+            
+          
+            We'll help you find exactly what you need for each stage of your 
+            pregnancy and your baby's development.
+        """)
+        
+    elif st.session_state.search_query is None:
+        # Show recommendations only after clicking Find Products
         st.title("Smart Product Recommender")
         
-        products = MOTHER_PRODUCTS.get(stage, []) if choice == "Mother" else BABY_PRODUCTS.get(age, [])
+        if choice == "Mother":
+            stage = st.session_state.user_answers["stage"]
+            products = MOTHER_PRODUCTS.get(stage, [])
+            st.subheader(f"🛍️ Recommended Products for {stage}")
+        else:
+            age = st.session_state.user_answers["age"]
+            products = BABY_PRODUCTS.get(age, [])
+            st.subheader(f"🛍️ Recommended Products for {age} Baby")
         
         if products:
-            st.subheader(f"🛍️ Recommended Products ")
-            
             # Display products in 3 columns
             cols = st.columns(3)
             for idx, product in enumerate(products):
@@ -558,7 +570,6 @@ def main():
                 with cols[idx % 4]:
                     st.image(
                         item["link"],
-                        # use_column_width=True,
                         caption=item["title"][:50] + ("..." if len(item["title"]) > 50 else "")
                     )
                     st.markdown(f"[🛒 View Product]({item['image']['contextLink']})")
