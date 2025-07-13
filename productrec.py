@@ -85,9 +85,17 @@ if bg_img:
         </style>
     """, unsafe_allow_html=True)
 # --- Configuration ---
+api_key=st.secrets["bilal_api"]
+
+# Configure Gemini API key
+
+cse_key=st.secrets["bilal_cse"]
+
+# Configure Gemini API key
+
 # Store these in your Streamlit secrets (secrets.toml)
-API_KEY = st.secrets.get("google_api", {}).get("key", "AIzaSyBYhKY9MQgCDX__BoKqvqx6z30VlnIAdsA")
-CSE_ID = st.secrets.get("google_api", {}).get("cse_id", "6517142dafb7440d8")
+API_KEY = st.secrets.get("google_api", {}).get("key",api_key)
+CSE_ID = st.secrets.get("google_api", {}).get("cse_id", cse_key)
 
 # --- Product Database (Trimmed for brevity) ---
 MOTHER_PRODUCTS = {
