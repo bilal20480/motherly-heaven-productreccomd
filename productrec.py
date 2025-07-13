@@ -88,7 +88,7 @@ if bg_img:
 api_key=st.secrets["bilal_api"]
 
 # Configure Gemini API key
-csi_id=st.secrets["bilal_api"]
+csi_id=st.secrets["bilal_cse"]
 
 # Configure Gemini API key
 
